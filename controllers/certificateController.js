@@ -1,9 +1,20 @@
+const { validationResult } = require("express-validator");
 const fs = require("fs");
 const path = require("path");
 const pupeeteer = require("puppeteer");
 
 module.exports.generateCertificateController = async (req, res) => {
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+        message: "Provide necessary data",
+      });
+    }
+
     const htmlTemplate = fs.readFileSync(
       path.resolve(__dirname, "../certificate.html"),
       "utf-8"
@@ -20,7 +31,7 @@ module.exports.generateCertificateController = async (req, res) => {
       dob,
       gender,
       bloodGroup,
-      currentDateTime
+      currentDateTime,
     } = req.body;
 
     const html = htmlTemplate
